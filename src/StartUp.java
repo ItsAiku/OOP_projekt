@@ -20,13 +20,16 @@ public class StartUp {
     public int getKapital() {
         return kapital;
     }
-    public void suurendaKliente(int uuedKliendid) {
-        this.klientideArv += uuedKliendid;
+    public void suurendaKliente(int uuteKlientideArv) {
+        this.klientideArv += uuteKlientideArv;
     }
     public int getKlitideArv() {
         return klientideArv;
     }
     public void lisaTöötaja(Töötaja uusTöötaja) {
         töötajad.add(uusTöötaja);
+    }
+    public List<Töötaja> getTöötajad(){
+        return töötajad;
     }
 }
