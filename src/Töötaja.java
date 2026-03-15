@@ -11,9 +11,9 @@ public class Töötaja {
     public Töötaja(String nimi, int koef){
         this.nimi = nimi;
         this.koef = koef;
-        this.palk = (int) (palk*Math.log(koef));
+        this.palk = (int) (palk*Math.log(koef)); //koef tuleneb olemasolevate töötajate arvust ja mõjutab uue töötaja palka
         Random rand = new Random();
-        this.töökus = Math.round(rand.nextDouble() * 0.99 * 100.0) / 100.0;
+        this.töökus = Math.round(rand.nextDouble() * 0.99 * 100.0) / 100.0; //töötaja productivity määramine
     }
 
     public String getNimi() {

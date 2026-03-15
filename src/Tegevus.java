@@ -4,12 +4,12 @@ import java.util.Random;
 public class Tegevus {
 
     public void töötajaPalkamine(StartUp startup, String nimi){
-        int kordaja = startup.getTöötajad().size();
+        int kordaja = startup.getTöötajad().size(); //kordaja on vajalik uue töötaja palga mõjutamisel ja tuleneb olemasolevate töötajate arvust
         Töötaja uusTöötaja = new Töötaja(nimi, kordaja);
     }
 
     public void turundusKampaania(StartUp startup){
-        double koef = startup.getKlientideArv() * (1 + Math.random());
+        double koef = startup.getKlientideArv() * (1 + Math.random()); //turunduskampaania suurendab klientide arvu mingi % võrra
     }
 
     public void töökuseReroll(StartUp startup){

@@ -5,15 +5,16 @@ public class StartUp {
     private int kapital;
     private List<Töötaja> töötajad;
     private int klientideArv;
+    private int tuluKliendiKohta;
 
     public StartUp(int kapital) {
         this.kapital = kapital;
-        this.töötajad = new ArrayList<>();
+        this.töötajad = new ArrayList<>(); //alguses pole töötajaid
         this.klientideArv = 0;
     }
 
     public StartUp(){
-        this.kapital = (int) ((Math.random()*(5000))+5000);
+        this.kapital = (int) ((Math.random()*(5000))+5000); //genereerib random kapitali suuruse vahemikus 5000-10000
         this.töötajad = new ArrayList<>();
         this.klientideArv = 0;
     }
@@ -26,9 +27,13 @@ public class StartUp {
 
     public void lisaTöötaja(Töötaja uusTöötaja) {töötajad.add(uusTöötaja);}
 
+    public void setTuluKliendiKohta(int uusTulu){this.tuluKliendiKohta = uusTulu;}
+
     public int getKapital() {return kapital;}
 
     public int getKlientideArv() {return klientideArv;}
 
     public List<Töötaja> getTöötajad(){return töötajad;}
+
+    public int getTuluKliendiKohta() {return tuluKliendiKohta;}
 }
