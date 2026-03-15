@@ -1,15 +1,19 @@
 import java.util.Random;
 
+import static java.lang.Math.round;
+
 public class Töötaja {
     private String nimi;
-    private int palk;
+    private int palk = 1200;
     private double töökus;
+    private final int koef;
 
-    public Töötaja(String nimi, int palk){
+    public Töötaja(String nimi, int koef){
         this.nimi = nimi;
-        this.palk = palk;
+        this.koef = koef;
+        this.palk = (int) (palk*Math.log(koef));
         Random rand = new Random();
-        this.töökus = rand.nextDouble() * 0.99;
+        this.töökus = Math.round(rand.nextDouble() * 0.99 * 100.0) / 100.0;
     }
 
     public String getNimi() {
