@@ -11,12 +11,14 @@ public class StartUp {
         this.kapital = kapital;
         this.töötajad = new ArrayList<>(); //alguses pole töötajaid
         this.klientideArv = 0;
+        this.tuluKliendiKohta = 150;
     }
 
     public StartUp(){
         this.kapital = (int) ((Math.random()*(5000))+5000); //genereerib random kapitali suuruse vahemikus 5000-10000
         this.töötajad = new ArrayList<>();
         this.klientideArv = 0;
+        this.tuluKliendiKohta = 150;
     }
 
     public void setKapital(int uusKapital) {this.kapital = uusKapital;}

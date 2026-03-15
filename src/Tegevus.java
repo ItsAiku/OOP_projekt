@@ -1,6 +1,8 @@
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Math.round;
+
 public class Tegevus {
 
     public void töötajaPalkamine(StartUp startup, String nimi){
@@ -9,7 +11,26 @@ public class Tegevus {
     }
 
     public void turundusKampaania(StartUp startup){
-        double koef = startup.getKlientideArv() * (1 + Math.random()); //turunduskampaania suurendab klientide arvu mingi % võrra
+        if (startup.getKlientideArv() == 0){
+            Random rand = new Random();
+            int uuedKliendid = rand.nextInt(201);//suurendab klientide arvu ming arvu võrra 0-200
+            startup.suurendaKliente(uuedKliendid);
+        }
+        else {
+            double rand1 = Math.random();
+            if (rand1 < 0.5){
+                int lisa = Math.toIntExact(round(startup.getKlientideArv() * (1 + Math.random())));
+                int praegusedKliendid = startup.getKlientideArv();
+                int uus_arv = praegusedKliendid + lisa;
+                startup.suurendaKliente(uus_arv);//turunduskampaania suurendab klientide arvu mingi % võrra
+            }
+            else {
+                Random rand2 = new Random();
+                int uuedKliendid = rand2.nextInt(201); //suurendab mingi arvu võrra 0-200
+                startup.suurendaKliente(uuedKliendid);
+            }
+        }
+
     }
 
     public void töökuseReroll(StartUp startup){
@@ -65,14 +86,14 @@ public class Tegevus {
         // 56–75: Vähenda klientide arvu 1–20%
         else if (number >= 56 && number <= 75) {
             int protsent = 1 + rand.nextInt(20);
-            int kaotus = (int) Math.round(startup.getKlientideArv() * protsent / 100.0);
+            int kaotus = (int) round(startup.getKlientideArv() * protsent / 100.0);
             startup.suurendaKliente(-kaotus);
             System.out.println("Klientide arv vähenes " + kaotus + " võrra (" + protsent + "%).");
         }
         // 76–95: Kaotad kapitali 5–20%
         else if (number >= 76 && number <= 95) {
             int protsent = 5 + rand.nextInt(16); // 5–20%
-            int kaotus = (int) Math.round(startup.getKapital() * protsent / 100.0);
+            int kaotus = (int) round(startup.getKapital() * protsent / 100.0);
             startup.suurendaKapital(-kaotus);
             System.out.println("Kaotasid kapitali " + kaotus + " (" + protsent + "%).");
         }
