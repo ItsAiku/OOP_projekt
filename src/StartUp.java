@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class StartUp {
@@ -5,10 +6,16 @@ public class StartUp {
     private List<Töötaja> töötajad;
     private int klientideArv;
 
-    public StartUp(int kapital, List<Töötaja> töötajad, int klitideArv) {
+    public StartUp(int kapital) {
         this.kapital = kapital;
-        this.töötajad = töötajad;
-        this.klientideArv = klitideArv;
+        this.töötajad = new ArrayList<>();
+        this.klientideArv = 0;
+    }
+
+    public StartUp(){
+        this.kapital = (int) ((Math.random()*(5000))+5000);
+        this.töötajad = new ArrayList<>();
+        this.klientideArv = 0;
     }
 
     public void setKapital(int uusKapital) {this.kapital = uusKapital;}
