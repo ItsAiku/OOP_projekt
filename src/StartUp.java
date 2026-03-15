@@ -28,7 +28,7 @@ public class StartUp {
 
     public int getKapital() {return kapital;}
 
-    public int getKlitideArv() {return klientideArv;}
+    public int getKlientideArv() {return klientideArv;}
 
     public List<Töötaja> getTöötajad(){return töötajad;}
 }
