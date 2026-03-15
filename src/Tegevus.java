@@ -59,17 +59,18 @@ public class Tegevus {
 
         // 1–20: Suurenda klientide arvu x korda
         if (number >= 1 && number <= 20) {
-            int kordaja = 2 + rand.nextInt(4); // x = 2 kuni 5
+            int suurendaja = 1 +rand.nextInt(59); // x = 2 kuni 4
             int praeguneArv = startup.getKlientideArv();
-            int uusArv = praeguneArv + kordaja;
+            int uusArv = praeguneArv + suurendaja;
             startup.suurendaKliente(uusArv - praeguneArv);
-            System.out.println("Klientide arv suurenes " + kordaja + " võrra!");
+            System.out.println("Klientide arv suurenes " + suurendaja + " võrra!");
         }
         // 21–40: Suurenda, mida teenitakse iga kliendi pealt (kasutame kapitali)
         else if (number >= 21 && number <= 40) {
-            int lisaKapital = (int) (startup.getKapital() * (0.05 + 0.15 * rand.nextDouble())); // +5%–20%
+            int lisaKapital = (int) (startup.getTuluKliendiKohta() * (0.05 + 0.15 * rand.nextDouble())); // +5%–20%
             startup.suurendaKapital(lisaKapital);
-            System.out.println("Tulu per klient suurenes! Kapital + " + lisaKapital);
+            System.out.println("Tulu per klient suurenes! Kapital: " + startup.getKapital());
+            
         }
         // 41–55: Töötaja lahkub
         else if (number >= 41 && number <= 55) {
