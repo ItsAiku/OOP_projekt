@@ -1,12 +1,15 @@
+import java.util.Random;
+
 public class Töötaja {
     private String nimi;
     private int palk;
-    private int töökus;
+    private double töökus;
 
-    public Töötaja(String nimi, int palk, int töökus){
+    public Töötaja(String nimi, int palk){
         this.nimi = nimi;
         this.palk = palk;
-        this.töökus = töökus;
+        Random rand = new Random();
+        this.töökus = rand.nextDouble() * 0.99;
     }
 
     public String getNimi() {
@@ -25,13 +28,11 @@ public class Töötaja {
         this.palk = palk;
     }
 
-    public int getTöökus() {
+    public double getTöökus() {
         return töökus;
     }
 
-    public void setTöökus(int töökus) {
+    public void setTöökus(double töökus) {
         this.töökus = töökus;
     }
 }
-
-
