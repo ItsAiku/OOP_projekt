@@ -11,25 +11,17 @@ public class StartUp {
         this.klientideArv = klitideArv;
     }
 
-    public void setKapital(int uusKapital) {
-        this.kapital = uusKapital;
-    }
-    public void suurendaKapital(int lisaKapital) {
-        this.kapital += lisaKapital;
-    }
-    public int getKapital() {
-        return kapital;
-    }
-    public void suurendaKliente(int uuteKlientideArv) {
-        this.klientideArv += uuteKlientideArv;
-    }
-    public int getKlitideArv() {
-        return klientideArv;
-    }
-    public void lisaTöötaja(Töötaja uusTöötaja) {
-        töötajad.add(uusTöötaja);
-    }
-    public List<Töötaja> getTöötajad(){
-        return töötajad;
-    }
+    public void setKapital(int uusKapital) {this.kapital = uusKapital;}
+
+    public void suurendaKapital(int lisaKapital) {this.kapital += lisaKapital;}
+
+    public void suurendaKliente(int uuteKlientideArv) {this.klientideArv += uuteKlientideArv;}
+
+    public void lisaTöötaja(Töötaja uusTöötaja) {töötajad.add(uusTöötaja);}
+
+    public int getKapital() {return kapital;}
+
+    public int getKlitideArv() {return klientideArv;}
+
+    public List<Töötaja> getTöötajad(){return töötajad;}
 }
