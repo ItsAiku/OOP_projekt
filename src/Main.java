@@ -122,7 +122,6 @@ public class Main {
 
                 case 6:
                     System.out.println("Müüsid firma! " + startup.getKapital() + " euroga maha.");
-                    kuvaSeis(startup);
                     gameRunning = false;
                     break;
 
