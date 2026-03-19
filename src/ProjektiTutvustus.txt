@@ -8,7 +8,7 @@ Mäng algab, kui käivitatakse Main.java fail, mille järel saab mängija sisest
 
 Klasside eesmärgid:
 Main - Main klass vastutab programmi käivitamise ja kasutajaga suhtlemise eest. Selles klassis asub menüü, mille kaudu mängija teeb oma valikuid.
-KapitalCheck -
+KapitalCheck - Kontrollib piisava kapitali olemasolu, et saaks tegevusi teha (tegevused maksavad).
 StartUp - StartUp klass haldab kogu ettevõtte loogikat, sealhulgas raha, töötajaid ja üldist arengut.
 Tegevus - Tegevus klassis on kirjeldatud kõik võimalikud tegevused, mida mängija saab teha. Näiteks: töötaja palkamine, turundus, töötaja töökuse parendamine, boonused.
 Töötaja - Töötaja klass kirjeldab ettevõtte töötajaid ning nende omadusi. Töötajad mõjutavad ettevõtte tootlikkust.
@@ -30,5 +30,4 @@ Hinnang:
 Oleme oma töö lõpptulemusega üldiselt rahul. Küll aga tulevikus võiksime lisada mängule rohkem funktsionaalsust.
 
 Testimine:
-
 Alguses tegime igale klassile test klasse. Maini testimiseks proovisime igal muudatusel ise mängu läbi mängida, et tagada mängu toimimise kindlus.
