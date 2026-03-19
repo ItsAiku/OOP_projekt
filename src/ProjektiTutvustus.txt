@@ -1,0 +1,34 @@
+Autorite nimed:
+Aivar Allik ja Nansen Palo
+
+Kirjeldus:
+Meie projekti ideeks oli luua terminalipõhine StartUp simulaator, kus mängija astub idufirma juhi rolli. Mängija alustab ettevõtte juhtimist olukorras, kus startup on saanud oma esimeselt inkubaatorilt 10000 eurot algkapitali.
+Simulaatori eesmärk on kasvatada ettevõtte väärtust ja teenida kasumit, et lõpuks firma võimalikult kasumlikult maha müüa. Firma müümine tähistab ka mängu lõppu.
+Mäng algab, kui käivitatakse Main.java fail, mille järel saab mängija sisestada valikuid terminali kaudu. Mängija saab valida erinevate tegevuste vahel, mis mõjutavad ettevõtte arengut, näiteks töötajate palkamine ja muud strateegilised otsused.
+
+Klasside eesmärgid:
+Main - Main klass vastutab programmi käivitamise ja kasutajaga suhtlemise eest. Selles klassis asub menüü, mille kaudu mängija teeb oma valikuid.
+KapitalCheck -
+StartUp - StartUp klass haldab kogu ettevõtte loogikat, sealhulgas raha, töötajaid ja üldist arengut.
+Tegevus - Tegevus klassis on kirjeldatud kõik võimalikud tegevused, mida mängija saab teha. Näiteks: töötaja palkamine, turundus, töötaja töökuse parendamine, boonused.
+Töötaja - Töötaja klass kirjeldab ettevõtte töötajaid ning nende omadusi. Töötajad mõjutavad ettevõtte tootlikkust.
+
+Projekti protsess:
+Projekti tegemine toimus mitmes etapis:
+esimesel nädalavahetusel arutasime projekti üldist ideed, valisime teema ning panime paika klasside struktuuri ja nende eesmärgid.
+teisel kokkusaamisel keskendusime klasside funktsionaalsuse loomisele ning proovisime need tööle saada.
+viimasel kokkusaamisel koostasime Main meetodi ning sidusime kõik klassid omavahel tervikuks, et programm töötaks ühtse süsteemina.
+
+Rühmatöösse panustamine:
+Tegime kogu projekti vältel rühmatööd koos ning panustasime võrdselt kõikidesse etappidesse.
+Projekti peale kulus kokku ligikaudu 20 tundi.
+
+Projekti tegemise mured:
+Suuri probleeme projekti käigus ei tekkinud, kuid keeruliseks osutus projekti struktuuri planeerimine ja klasside väljamõtlemine.
+
+Hinnang:
+Oleme oma töö lõpptulemusega üldiselt rahul. Küll aga tulevikus võiksime lisada mängule rohkem funktsionaalsust.
+
+Testimine:
+
+Alguses tegime igale klassile test klasse. Maini testimiseks proovisime igal muudatusel ise mängu läbi mängida, et tagada mängu toimimise kindlus.
