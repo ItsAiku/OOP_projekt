@@ -14,17 +14,21 @@ public class KapitalCheck {
     public void kontrolliKapitali(StartUp startup){
         if (startup.getKapital()<100){
             this.turundusKampaania = false;
+            System.out.println("You aint got the money bitch.");
         }
         if (startup.getKapital()<200){
             this.töökuseReroll = false;
+            System.out.println("You aint got the money bitch.");
         }
         if (startup.getKapital()<500){
             this.perkid = false;
+            System.out.println("You aint got the money bitch.");
         }
         int töötajad = startup.getTöötajad().size();
         Töötaja t = new Töötaja("", töötajad);
         if (t.getPalk()>startup.getKapital()){
             this.töötajaPalkamine = false;
+            System.out.println("You aint got the money bitch.");
         }
     }
 

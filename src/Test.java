@@ -1,32 +1,55 @@
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
+import java.util.Random;
 
 public class Test {
 
+    public static void kuvaSeis (StartUp startup){
+        System.out.println("\n------ SUMMARY ------");
+        System.out.println("Kapital: " + startup.getKapital());
+        System.out.println("Kliendid: " + startup.getKlientideArv());
+        System.out.println("Töötajad: " + startup.getTöötajad().size());
+        System.out.println("Tulu kliendi kohta: " + startup.getTuluKliendiKohta());
+
+        System.out.println("\nTöötajate list:");
+        for (Töötaja t : startup.getTöötajad()) {
+            System.out.println("- " + t.getNimi() +
+                    " | palk: " + t.getPalk() +
+                    " | töökus: " + t.getTöökus());
+        }
+        System.out.println("----------------------\n");
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int koef = 1;
-        // Algus
+        Tegevus tegevus = new Tegevus();
+        KapitalCheck check = new KapitalCheck();
+        Random rand = new Random();
+
         System.out.println("Tere tulemast Startup Simulaatorisse!");
-        System.out.println("Sisesta oma esimese töötaja nimi: ");
+
+        StartUp startup = new StartUp(10000);
+
+        System.out.print("Sisesta oma esimese töötaja nimi: ");
         String nimi = scanner.nextLine();
-        Töötaja esimene = new Töötaja(nimi, koef);
-        List<Töötaja> töötajad = new ArrayList<>();
-        töötajad.add(esimene);
-        System.out.println("--------------------------------------");
+        Töötaja esimene = new Töötaja(nimi, 1);
+        startup.lisaTöötaja(esimene);
 
         boolean gameRunning = true;
 
         while (gameRunning) {
-            // Menüü
+
+            // kontrolli kapitali enne iga käiku
+            check = new KapitalCheck();
+            check.kontrolliKapitali(startup);
+
+
+            // menüü
             System.out.println("\nVali tegevus:");
             System.out.println("1 - Töötaja palkamine");
             System.out.println("2 - Turunduskampaania");
             System.out.println("3 - Töötaja töökuse reroll");
-            System.out.println("4 - Perkid / boonused");
-            System.out.println("5 - Skip (järgmine käik)");
+            System.out.println("4 - Perkid");
+            System.out.println("5 - Skip");
             System.out.println("6 - Müü firma");
 
             System.out.print("Sisesta valik: ");
@@ -35,46 +58,97 @@ public class Test {
             try {
                 choice = Integer.parseInt(scanner.nextLine());
             } catch (Exception e) {
-                System.out.println("Vigane sisend! Proovi uuesti.");
+                System.out.println("Vigane sisend!");
                 continue;
             }
 
+            for (Töötaja t : startup.getTöötajad()){
+                startup.setKapital(startup.getKapital()-t.getPalk());
+            }
             switch (choice) {
+
                 case 1:
-                    System.out.println("Selleks, et palgata töötajat. Peate sisestama nime: ");
-                    String töötaja = scanner.nextLine();
-                    töötajad.add(new Töötaja(nimi, ++koef));
+                    if (!check.isTöötajaPalkamine()) {
+                        System.out.println("Pole piisavalt raha töötaja palkamiseks!");
+                        kuvaSeis(startup);
+                        break;
+                    }
+                    System.out.print("Sisesta töötaja nimi: ");
+                    String töötajaNimi = scanner.nextLine();
+                    tegevus.töötajaPalkamine(startup, töötajaNimi);
+                    startup.lisaTöötaja(new Töötaja(töötajaNimi, startup.getTöötajad().size()));
                     System.out.println("Palkasid uue töötaja!");
+                    kuvaSeis(startup);
                     break;
 
                 case 2:
-                    System.out.println("Alustasid turunduskampaaniat!");
-                    // company.startMarketing();
+                    if (!check.isTurundusKampaania()) {
+                        System.out.println("Pole piisavalt raha kampaaniaks!");
+                        kuvaSeis(startup);
+                        break;
+                    }
+                    tegevus.turundusKampaania(startup);
+                    System.out.println("Tegid turunduskampaania!");
+                    kuvaSeis(startup);
                     break;
 
                 case 3:
-                    System.out.println("Rerollisid töötaja töökuse!");
-                    // company.rerollEmployee();
+                    if (!check.isTöökuseReroll()) {
+                        System.out.println("Pole piisavalt raha rerolliks!");
+                        kuvaSeis(startup);
+                        break;
+                    }
+                    System.out.print("Sisesta töötaja nimi: ");
+                    String nimiReroll = scanner.nextLine();
+                    tegevus.töökuseReroll(startup, nimiReroll);
+                    System.out.println("Reroll tehtud!");
+                    kuvaSeis(startup);
                     break;
 
                 case 4:
-                    System.out.println("Avad perkide menüü!");
-                    // company.showPerks();
+                    if (!check.isPerkid()) {
+                        System.out.println("Pole piisavalt raha perkideks!");
+                        kuvaSeis(startup);
+                        break;
+                    }
+                    int number = rand.nextInt(100) + 1;
+                    tegevus.perkid(number, startup);
+                    kuvaSeis(startup);
                     break;
 
                 case 5:
                     System.out.println("Skipid käigu...");
-                    // company.nextTurn();
+                    kuvaSeis(startup);
                     break;
 
                 case 6:
-                    System.out.println("Müüsid oma firma! Mäng läbi.");
-                    // company.sellCompany();
+                    System.out.println("Müüsid firma!");
+                    kuvaSeis(startup);
                     gameRunning = false;
                     break;
 
                 default:
-                    System.out.println("Sellist valikut ei ole!");
+                    System.out.println("Vale valik!");
+
+
+            }
+            double töökuseSumma = 0;
+            for (Töötaja t : startup.getTöötajad()){
+                töökuseSumma += t.getTöökus();
+            }
+            double avgTöökus = töökuseSumma/startup.getTöötajad().size();
+            startup.setTuluKliendiKohta((int) (startup.getBaseTuluKliendiKohta()*avgTöökus));
+
+            // iga käigu lõpus teenid raha klientidelt
+            int tulu = startup.getKlientideArv() * startup.getTuluKliendiKohta();
+            startup.suurendaKapital(tulu);
+
+            System.out.println("Teenitud tulu: " + tulu);
+
+            // game over check
+            if (startup.getKapital() <= 0) {
+                System.out.println("Sul sai raha otsa! Game over.");
+                gameRunning = false;
             }
         }
 
@@ -82,3 +156,5 @@ public class Test {
         System.out.println("Aitäh mängimast!");
     }
 }
+
+

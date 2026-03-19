@@ -6,12 +6,14 @@ public class StartUp {
     private List<Töötaja> töötajad;
     private int klientideArv;
     private int tuluKliendiKohta;
+    private int baseTuluKliendiKohta;
 
     public StartUp(int kapital) {
         this.kapital = kapital;
         this.töötajad = new ArrayList<>(); //alguses pole töötajaid
         this.klientideArv = 0;
-        this.tuluKliendiKohta = 150;
+        this.tuluKliendiKohta = 20;
+        this.baseTuluKliendiKohta = 20;
     }
 
     public StartUp(){
@@ -38,4 +40,6 @@ public class StartUp {
     public List<Töötaja> getTöötajad(){return töötajad;}
 
     public int getTuluKliendiKohta() {return tuluKliendiKohta;}
+
+    public int getBaseTuluKliendiKohta(){return baseTuluKliendiKohta;}
 }

@@ -10,25 +10,27 @@ public class Tegevus {
         Töötaja uusTöötaja = new Töötaja(nimi, kordaja);
         int kapital = startup.getKapital();
         startup.setKapital(kapital-uusTöötaja.getPalk());
+
     }
 
     public void turundusKampaania(StartUp startup){
         if (startup.getKlientideArv() == 0){
             Random rand = new Random();
-            int uuedKliendid = rand.nextInt(201);//suurendab klientide arvu ming arvu võrra 0-200
+            int uuedKliendid = rand.nextInt(301);//suurendab klientide arvu ming arvu võrra 0-200
             startup.suurendaKliente(uuedKliendid);
+            System.out.println(startup.getTuluKliendiKohta());
         }
         else {
             double rand1 = Math.random();
-            if (rand1 < 0.5){
-                int lisa = Math.toIntExact(round(startup.getKlientideArv() * (1 + Math.random())));
+            if (rand1 < 0.1){
+                int lisa = Math.toIntExact(round(startup.getKlientideArv() * (0.5*Math.random())));
                 int praegusedKliendid = startup.getKlientideArv();
                 int uus_arv = praegusedKliendid + lisa;
                 startup.suurendaKliente(uus_arv);//turunduskampaania suurendab klientide arvu mingi % võrra
             }
             else {
                 Random rand2 = new Random();
-                int uuedKliendid = rand2.nextInt(201); //suurendab mingi arvu võrra 0-200
+                int uuedKliendid = rand2.nextInt(301); //suurendab mingi arvu võrra 0-200
                 startup.suurendaKliente(uuedKliendid);
             }
         }
@@ -52,7 +54,7 @@ public class Tegevus {
         for (Töötaja t : töötajad){
             if (t.getNimi().equals(nimi)){
                 Random rand = new Random();
-                t.setTöökus(rand.nextDouble() * 0.99);
+                t.setTöökus(Math.round(rand.nextDouble() * 0.99 * 100.0) / 100.0);
             }
         }
         int kapital = startup.getKapital();
@@ -75,7 +77,7 @@ public class Tegevus {
         }
         // 21–40: Suurenda, mida teenitakse iga kliendi pealt (kasutame kapitali)
         else if (number >= 21 && number <= 40) {
-            int lisaKapital = (int) (startup.getTuluKliendiKohta() * (0.05 + 0.15 * rand.nextDouble())); // +5%–20%
+            int lisaKapital = (int) (startup.getTuluKliendiKohta() * (1 + 0.15 * rand.nextDouble())); // +5%–20%
             startup.suurendaKapital(lisaKapital);
             System.out.println("Tulu per klient suurenes! Kapital: " + startup.getKapital());
             
