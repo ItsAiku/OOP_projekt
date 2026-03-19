@@ -1,12 +1,10 @@
 import java.util.Random;
 
-import static java.lang.Math.round;
-
 public class Töötaja {
     private String nimi;
     private int palk = 1200;
     private double töökus;
-    private final int koef;
+    private int koef;
 
     public Töötaja(String nimi, int koef){
         this.nimi = nimi;

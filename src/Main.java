@@ -4,13 +4,13 @@ import java.util.Random;
 public class Main {
 
     public static void kuvaSeis (StartUp startup){
-        System.out.println("\n------ SUMMARY ------");
+        System.out.println("\n------ SUMMARY ------");//annab ülevaate hetkeseisust
         System.out.println("Kapital: " + startup.getKapital());
         System.out.println("Kliendid: " + startup.getKlientideArv());
         System.out.println("Töötajad: " + startup.getTöötajad().size());
         System.out.println("Tulu kliendi kohta: " + startup.getTuluKliendiKohta());
 
-        System.out.println("\nTöötajate list:");
+        System.out.println("\nTöötajate list:");//annab ülevaate töötajatest
         for (Töötaja t : startup.getTöötajad()) {
             System.out.println("- " + t.getNimi() +
                     " | palk: " + t.getPalk() +
@@ -24,26 +24,25 @@ public class Main {
         Tegevus tegevus = new Tegevus();
         KapitalCheck check = new KapitalCheck();
         Random rand = new Random();
+        boolean gameRunning = true;
+
 
         System.out.println("Tere tulemast Startup Simulaatorisse!");
 
-        StartUp startup = new StartUp(10000);
+        StartUp startup = new StartUp(10000);//luuakse ettevõtte algkapitalige 10000, on olemas ka random kapitaliga konstruktor mida praegu ei kasutata
 
-        System.out.print("Sisesta oma esimese töötaja nimi: ");
+        System.out.print("Sisesta oma esimese töötaja nimi: ");//luuakse esimene töötaja
         String nimi = scanner.nextLine();
         Töötaja esimene = new Töötaja(nimi, 1);
         startup.lisaTöötaja(esimene);
 
-        boolean gameRunning = true;
-
         while (gameRunning) {
 
             // kontrolli kapitali enne iga käiku
-            check = new KapitalCheck();
             check.kontrolliKapitali(startup);
 
 
-            // menüü
+            // menüü, kust saab tegevusi valida
             System.out.println("\nVali tegevus:");
             System.out.println("1 - Töötaja palkamine");
             System.out.println("2 - Turunduskampaania");
@@ -63,7 +62,7 @@ public class Main {
             }
 
             for (Töötaja t : startup.getTöötajad()){
-                startup.setKapital(startup.getKapital()-t.getPalk());
+                startup.setKapital(startup.getKapital()-t.getPalk());//iga kuu makstakse töötajatele palka, mis võetakse kapitalist maha
             }
             switch (choice) {
 
@@ -122,7 +121,7 @@ public class Main {
                     break;
 
                 case 6:
-                    System.out.println("Müüsid firma!");
+                    System.out.println("Müüsid firma! " + startup.getKapital() + " euroga maha.");
                     kuvaSeis(startup);
                     gameRunning = false;
                     break;
@@ -132,12 +131,17 @@ public class Main {
 
 
             }
+            //iga kuu lõpus arvutatakse uuesti keskmine töökus ja selle põhjal tulu kliendi kohta
+            //keskminst töökust muudavad uue töötaja palkamine ja töötaja reroll
             double töökuseSumma = 0;
             for (Töötaja t : startup.getTöötajad()){
                 töökuseSumma += t.getTöökus();
             }
             double avgTöökus = töökuseSumma/startup.getTöötajad().size();
             startup.setTuluKliendiKohta((int) (startup.getBaseTuluKliendiKohta()*avgTöökus));
+
+            //klientide "churn" ehk 5% kliente lahkub iga kuu
+            startup.setKliendid((int) (startup.getKlientideArv()*0.95));
 
             // iga käigu lõpus teenid raha klientidelt
             int tulu = startup.getKlientideArv() * startup.getTuluKliendiKohta();
@@ -147,14 +151,11 @@ public class Main {
 
             // game over check
             if (startup.getKapital() <= 0) {
-                System.out.println("Sul sai raha otsa! Game over.");
+                System.out.println("Sul sai raha otsa! Mäng läbi.");
                 gameRunning = false;
             }
         }
 
         scanner.close();
-        System.out.println("Aitäh mängimast!");
     }
 }
-
-

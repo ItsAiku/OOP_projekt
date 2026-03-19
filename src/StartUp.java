@@ -1,12 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
 
+//ettevõtte objekt
+
 public class StartUp {
     private int kapital;
     private List<Töötaja> töötajad;
     private int klientideArv;
     private int tuluKliendiKohta;
-    private int baseTuluKliendiKohta;
+    private int baseTuluKliendiKohta; //kasutatakse uue tulu kliendi kohta arvutamisel pärast avg töökuse muutumist
 
     public StartUp(int kapital) {
         this.kapital = kapital;
@@ -18,7 +20,7 @@ public class StartUp {
 
     public StartUp(){
         this.kapital = (int) ((Math.random()*(5000))+5000); //genereerib random kapitali suuruse vahemikus 5000-10000
-        this.töötajad = new ArrayList<>();
+        this.töötajad = new ArrayList<>(); //töötajate nimekiri
         this.klientideArv = 0;
         this.tuluKliendiKohta = 150;
     }
@@ -42,4 +44,6 @@ public class StartUp {
     public int getTuluKliendiKohta() {return tuluKliendiKohta;}
 
     public int getBaseTuluKliendiKohta(){return baseTuluKliendiKohta;}
+
+    public void setKliendid(int uusKlientideArv){this.klientideArv = uusKlientideArv;}
 }

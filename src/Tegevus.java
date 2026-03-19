@@ -8,21 +8,17 @@ public class Tegevus {
     public void töötajaPalkamine(StartUp startup, String nimi){
         int kordaja = startup.getTöötajad().size(); //kordaja on vajalik uue töötaja palga mõjutamisel ja tuleneb olemasolevate töötajate arvust
         Töötaja uusTöötaja = new Töötaja(nimi, kordaja);
-        int kapital = startup.getKapital();
-        startup.setKapital(kapital-uusTöötaja.getPalk());
-
     }
 
     public void turundusKampaania(StartUp startup){
         if (startup.getKlientideArv() == 0){
             Random rand = new Random();
-            int uuedKliendid = rand.nextInt(301);//suurendab klientide arvu ming arvu võrra 0-200
+            int uuedKliendid = rand.nextInt(301);//suurendab klientide arvu ming arvu võrra 0-300
             startup.suurendaKliente(uuedKliendid);
-            System.out.println(startup.getTuluKliendiKohta());
         }
         else {
             double rand1 = Math.random();
-            if (rand1 < 0.1){
+            if (rand1 < 0.1){//juhtub vaid ühel juhul kümnest, kuna kasvab toimude väga suurelt
                 int lisa = Math.toIntExact(round(startup.getKlientideArv() * (0.5*Math.random())));
                 int praegusedKliendid = startup.getKlientideArv();
                 int uus_arv = praegusedKliendid + lisa;
@@ -30,17 +26,18 @@ public class Tegevus {
             }
             else {
                 Random rand2 = new Random();
-                int uuedKliendid = rand2.nextInt(301); //suurendab mingi arvu võrra 0-200
+                int uuedKliendid = rand2.nextInt(301); //suurendab mingi arvu võrra 0-300
                 startup.suurendaKliente(uuedKliendid);
             }
         }
+        //turunduskampaania maksab, seega peame kapitali vähendama, max kulu on 10% kapitalist
         int kapital = startup.getKapital();
         Random r = new Random();
         double kordaja = 0.9 + (0.98 - 0.9) * r.nextDouble();
         startup.setKapital(Math.toIntExact(round(kapital * kordaja)));
 
     }
-
+//suvalise töötaja reroll, ei kasuta praegu
 //    public void töökuseReroll(StartUp startup){
 //        List<Töötaja> töötajad = startup.getTöötajad();
 //        Random rand = new Random();
@@ -49,7 +46,7 @@ public class Tegevus {
 //        töötaja.setTöökus(rand1.nextDouble() * 0.99);
 //    }
 
-    public void töökuseReroll(StartUp startup, String nimi){
+    public void töökuseReroll(StartUp startup, String nimi){//rerollib valitud töötaja töökuse määra
         List<Töötaja> töötajad = startup.getTöötajad();
         for (Töötaja t : töötajad){
             if (t.getNimi().equals(nimi)){
@@ -58,10 +55,10 @@ public class Tegevus {
             }
         }
         int kapital = startup.getKapital();
-        startup.setKapital(kapital-200);
+        startup.setKapital(kapital-200);//reroll maksab 200
     }
     public void perkid(int number, StartUp startup) {
-        if (number < 1 || number > 100) {
+        if (number < 1 || number > 100) {//erinevatel perkidel on erinevad võimalused toimuda, selleks on erinevad number range'd
             throw new IllegalArgumentException("Number peab olema 1–100.");
         }
 
@@ -113,6 +110,6 @@ public class Tegevus {
             System.out.println("Ei juhtu midagi.");
         }
         int kapital = startup.getKapital();
-        startup.setKapital(kapital-500);
+        startup.setKapital(kapital-500);//perkide kasutamine maksab 500 + perki enda toime
     }
 }
