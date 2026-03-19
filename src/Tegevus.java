@@ -8,6 +8,8 @@ public class Tegevus {
     public void töötajaPalkamine(StartUp startup, String nimi){
         int kordaja = startup.getTöötajad().size(); //kordaja on vajalik uue töötaja palga mõjutamisel ja tuleneb olemasolevate töötajate arvust
         Töötaja uusTöötaja = new Töötaja(nimi, kordaja);
+        int kapital = startup.getKapital();
+        startup.setKapital(kapital-uusTöötaja.getPalk());
     }
 
     public void turundusKampaania(StartUp startup){
@@ -30,16 +32,20 @@ public class Tegevus {
                 startup.suurendaKliente(uuedKliendid);
             }
         }
+        int kapital = startup.getKapital();
+        Random r = new Random();
+        double kordaja = 0.9 + (0.98 - 0.9) * r.nextDouble();
+        startup.setKapital(Math.toIntExact(round(kapital * kordaja)));
 
     }
 
-    public void töökuseReroll(StartUp startup){
-        List<Töötaja> töötajad = startup.getTöötajad();
-        Random rand = new Random();
-        Töötaja töötaja = töötajad.get(rand.nextInt(töötajad.size()));
-        Random rand1 = new Random();
-        töötaja.setTöökus(rand1.nextDouble() * 0.99);
-    }
+//    public void töökuseReroll(StartUp startup){
+//        List<Töötaja> töötajad = startup.getTöötajad();
+//        Random rand = new Random();
+//        Töötaja töötaja = töötajad.get(rand.nextInt(töötajad.size()));
+//        Random rand1 = new Random();
+//        töötaja.setTöökus(rand1.nextDouble() * 0.99);
+//    }
 
     public void töökuseReroll(StartUp startup, String nimi){
         List<Töötaja> töötajad = startup.getTöötajad();
@@ -49,6 +55,8 @@ public class Tegevus {
                 t.setTöökus(rand.nextDouble() * 0.99);
             }
         }
+        int kapital = startup.getKapital();
+        startup.setKapital(kapital-200);
     }
     public void perkid(int number, StartUp startup) {
         if (number < 1 || number > 100) {
@@ -102,5 +110,7 @@ public class Tegevus {
         else {
             System.out.println("Ei juhtu midagi.");
         }
+        int kapital = startup.getKapital();
+        startup.setKapital(kapital-500);
     }
 }
