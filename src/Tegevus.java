@@ -1,6 +1,5 @@
 import java.util.List;
 import java.util.Random;
-
 import static java.lang.Math.round;
 
 public class Tegevus {
@@ -11,29 +10,22 @@ public class Tegevus {
     }
 
     public void turundusKampaania(StartUp startup){
-        if (startup.getKlientideArv() == 0){
+        double rand1 = Math.random();
+        if (startup.getKlientideArv() == 0 || rand1 > 0.1){
             Random rand = new Random();
             int uuedKliendid = rand.nextInt(301);//suurendab klientide arvu ming arvu võrra 0-300
             startup.suurendaKliente(uuedKliendid);
         }
-        else {
-            double rand1 = Math.random();
-            if (rand1 < 0.1){//juhtub vaid ühel juhul kümnest, kuna kasvab toimude väga suurelt
-                int lisa = Math.toIntExact(round(startup.getKlientideArv() * (0.5*Math.random())));
-                int praegusedKliendid = startup.getKlientideArv();
-                int uus_arv = praegusedKliendid + lisa;
-                startup.suurendaKliente(uus_arv);//turunduskampaania suurendab klientide arvu mingi % võrra
+        else {//tegemis on harva sündmusega, et mängu balanseerida
+            int lisa = Math.toIntExact(round(startup.getKlientideArv() * (0.5*Math.random())));
+            int praegusedKliendid = startup.getKlientideArv();
+            int uus_arv = praegusedKliendid + lisa;
+            startup.suurendaKliente(uus_arv);//turunduskampaania suurendab klientide arvu mingi % võrra
             }
-            else {
-                Random rand2 = new Random();
-                int uuedKliendid = rand2.nextInt(301); //suurendab mingi arvu võrra 0-300
-                startup.suurendaKliente(uuedKliendid);
-            }
-        }
-        //turunduskampaania maksab, seega peame kapitali vähendama, max kulu on 10% kapitalist
+        //turunduskampaania maksab, seega peame kapitali vähendama, max kulu on 10% kapitalist, min 2%
         int kapital = startup.getKapital();
         Random r = new Random();
-        double kordaja = 0.9 + (0.98 - 0.9) * r.nextDouble();
+        double kordaja = 0.9 + 0.08 * r.nextDouble();
         startup.setKapital(Math.toIntExact(round(kapital * kordaja)));
 
     }
@@ -66,15 +58,15 @@ public class Tegevus {
 
         // 1–20: Suurenda klientide arvu x korda
         if (number >= 1 && number <= 20) {
-            int suurendaja = 1 +rand.nextInt(59); // x = 2 kuni 4
+            double suurendaja = 1 + rand.nextDouble(); // 1 < x < 2
             int praeguneArv = startup.getKlientideArv();
-            int uusArv = praeguneArv + suurendaja;
+            int uusArv = (int) (praeguneArv * suurendaja);
             startup.suurendaKliente(uusArv - praeguneArv);
-            System.out.println("Klientide arv suurenes " + suurendaja + " võrra!");
+            System.out.println("Klientide arv suurenes " + round(suurendaja*100)/100 + " korda!");
         }
         // 21–40: Suurenda, mida teenitakse iga kliendi pealt (kasutame kapitali)
         else if (number >= 21 && number <= 40) {
-            int lisaKapital = (int) (startup.getTuluKliendiKohta() * (1 + 0.15 * rand.nextDouble())); // +5%–20%
+            int lisaKapital = (int) (startup.getTuluKliendiKohta() * (1.05 + 0.15 * rand.nextDouble())); // +5% kuni 20%
             startup.suurendaKapital(lisaKapital);
             System.out.println("Tulu per klient suurenes! Kapital: " + startup.getKapital());
             

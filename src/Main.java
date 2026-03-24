@@ -4,13 +4,13 @@ import java.util.Random;
 public class Main {
 
     public static void kuvaSeis (StartUp startup){
-        System.out.println("\n------ SUMMARY ------");//annab ülevaate hetkeseisust
+        System.out.println("\n------ KOKKUVÕTE ------");//annab ülevaate hetkeseisust
         System.out.println("Kapital: " + startup.getKapital());
         System.out.println("Kliendid: " + startup.getKlientideArv());
         System.out.println("Töötajad: " + startup.getTöötajad().size());
         System.out.println("Tulu kliendi kohta: " + startup.getTuluKliendiKohta());
 
-        System.out.println("\nTöötajate list:");//annab ülevaate töötajatest
+        System.out.println("\nTöötajad:");//annab ülevaate töötajatest
         for (Töötaja t : startup.getTöötajad()) {
             System.out.println("- " + t.getNimi() +
                     " | palk: " + t.getPalk() +
@@ -26,29 +26,35 @@ public class Main {
         Random rand = new Random();
         boolean gameRunning = true;
 
-
-        System.out.println("Tere tulemast Startup Simulaatorisse!");
-
         StartUp startup = new StartUp(10000);//luuakse ettevõtte algkapitalige 10000, on olemas ka random kapitaliga konstruktor mida praegu ei kasutata
-
-        System.out.print("Sisesta oma esimese töötaja nimi: ");//luuakse esimene töötaja
+        System.out.println("Tere tulemast Startup Simulaatorisse!");
+        System.out.println("\nTegevuste tutvustus:");
+        System.out.println("1. Töötaja palkamine (Maksumus: töötaja palk iga kuu) - Palkab uue töötaja, kellele saad määrata nime ja genereeritakse suvaline töökuse kordaja.");
+        System.out.println("2. Turunduskampaania (Maksumus: 10% kuni 2% kapitalist) - Saad viia läbi turunduskampaania, mis tõstab klientide arvu.");
+        System.out.println("3. Töötaja töökuse reroll (Maksumus: 200) - Saad valida töötaja, kelle töökust soovid rerollida.");
+        System.out.println("4. Perkid (Maksumus: 500) - Erinevad boonused, sisu jääb üllatuseks.");
+        System.out.println("5. Skip (Maksumus: 0) - Jätad ühe kuu vahele. NB! Endiselt pead maksma palka, kuid samas teenid ka tulu klientidelt.");
+        System.out.println("6. Müü firma - Müüd oma ettevõtte kapitali väärtusega maha, mängu lõpp.");
+        System.out.println("Sinu algkapital on " + startup.getKapital() + "."); //igaks juhuks kui tulevikus tahab random kapitali generate kasutada
+        System.out.print("Mängu alustamiseks sisesta kõigepealt oma esimese töötaja nimi: ");//luuakse esimene töötaja
         String nimi = scanner.nextLine();
         Töötaja esimene = new Töötaja(nimi, 1);
         startup.lisaTöötaja(esimene);
+
+
 
         while (gameRunning) {
 
             // kontrolli kapitali enne iga käiku
             check.kontrolliKapitali(startup);
 
-
             // menüü, kust saab tegevusi valida
             System.out.println("\nVali tegevus:");
-            System.out.println("1 - Töötaja palkamine");
-            System.out.println("2 - Turunduskampaania");
-            System.out.println("3 - Töötaja töökuse reroll");
-            System.out.println("4 - Perkid");
-            System.out.println("5 - Skip");
+            System.out.println("1 - Töötaja palkamine (Maksumus: töötaja palk iga kuu)");
+            System.out.println("2 - Turunduskampaania (Maksumus: 10% kuni 2% kapitalist)");
+            System.out.println("3 - Töötaja töökuse reroll (Maksumus: 200)");
+            System.out.println("4 - Perkid (Maksumus: 500)");
+            System.out.println("5 - Skip (Maksumus: 0)");
             System.out.println("6 - Müü firma");
 
             System.out.print("Sisesta valik: ");
