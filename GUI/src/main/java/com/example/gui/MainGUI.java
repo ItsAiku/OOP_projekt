@@ -380,7 +380,7 @@ public class MainGUI extends Application {
         }
 
         int number = rand.nextInt(100) + 1;
-        log("✨ Perkid aktiveeritud…");
+        log("Perkid aktiveeritud…");
         tegevus.perkid(number, startup);
         maksaPalka();
         endTurn();
