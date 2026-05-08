@@ -92,7 +92,7 @@ public class Tegevus {
         }
         // 76–95: Kaotad kapitali 5–20%
         else if (number >= 76 && number <= 95) {
-            int protsent = 5 + rand.nextInt(16); // 5–20%
+            int protsent = 5 + rand.nextInt(16); // 5+1-15%
             int kaotus = (int) round(startup.getKapital() * protsent / 100.0);
             startup.suurendaKapital(-kaotus);
             System.out.println("Kaotasid kapitali " + kaotus + " (" + protsent + "%).");

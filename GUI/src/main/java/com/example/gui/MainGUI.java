@@ -24,6 +24,7 @@ public class MainGUI extends Application {
     private KapitalCheck check;
     private Random rand;
     private boolean gameRunning;
+    private boolean logSaved = false;
 
     // UI osad
     private Label kapitalLabel;
@@ -39,6 +40,7 @@ public class MainGUI extends Application {
     private Button skipBtn;
     private Button müüBtn;
     private Label statusBar;
+    private Label lastGameCapitalLabel;
 
     //värvid kasutamiseks
     private static final String BG_DARK   = "#0d1117";
@@ -119,6 +121,8 @@ public class MainGUI extends Application {
         stage.setMinHeight(520);
         stage.show();
         root.requestFocus();//teeb kindlaks, et klaviatuur võtab rootilt inputi
+        stage.setOnCloseRequest(e -> saveLog());
+        root.requestFocus();
 
         //alustab mängu
         alusta();
@@ -129,7 +133,26 @@ public class MainGUI extends Application {
         Label title = new Label("Startup Simulaator");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_MAIN + "; -fx-font-family: 'Segoe UI', sans-serif;");
 
-        HBox bar = new HBox(10, title);
+        String lastCapital = loadLastGameCapital();
+        Label lastTitle = new Label("EELMINE MÄNG");
+        lastTitle.setStyle("-fx-font-size: 10px; -fx-text-fill: " + TEXT_DIM + "; -fx-font-family: monospace;");
+
+        lastGameCapitalLabel = new Label(lastCapital);
+        lastGameCapitalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + YELLOW + "; -fx-font-family: 'Consolas', monospace;");
+
+        VBox lastBox = new VBox(2, lastTitle, lastGameCapitalLabel);
+        lastBox.setAlignment(Pos.CENTER_RIGHT);
+        lastBox.setPadding(new Insets(4, 6, 4, 12));
+        lastBox.setStyle(
+                "-fx-background-color: " + BG_CARD + ";" +
+                        "-fx-border-color: " + YELLOW + "44;" +
+                        "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;"
+        );
+
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox bar = new HBox(10, title, spacer, lastBox);
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.setPadding(new Insets(0, 0, 8, 4));
 
@@ -490,6 +513,7 @@ public class MainGUI extends Application {
     private void endGame(String message) {
         gameRunning = false;
         disableActions();
+        saveLog();
         showInfo(message);
     }
 
@@ -683,7 +707,44 @@ public class MainGUI extends Application {
         });
         System.setOut(ps);
     }
+    private void saveLog() {
+        if (logSaved) return;
+        logSaved = true;
 
+        String content = logArea.getText();
+        if (content == null || content.isBlank()) return;
 
+        // Always append a reliable final-capital marker
+        String finalLine = "\n[LÕPP] Kapital: " + startup.getKapital() + " €";
+        String timestamp = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        java.nio.file.Path path = java.nio.file.Paths.get("startup_log_" + timestamp + ".txt");
 
+        try {
+            java.nio.file.Files.writeString(path, content + finalLine);
+            System.err.println("Log salvestatud: " + path.toAbsolutePath());
+        } catch (java.io.IOException ex) {
+            System.err.println("Logi salvestamine ebaõnnestus: " + ex.getMessage());
+        }
+    }
+    private String loadLastGameCapital() {
+        try {
+            java.nio.file.Path dir = java.nio.file.Paths.get(".");
+            java.util.Optional<java.nio.file.Path> latest = java.nio.file.Files.list(dir)
+                    .filter(p -> p.getFileName().toString().matches("startup_log_.*\\.txt"))
+                    .max(java.util.Comparator.comparing(p -> p.getFileName().toString()));
+
+            if (latest.isEmpty()) return "—";
+
+            String content = java.nio.file.Files.readString(latest.get());
+            for (String line : content.split("\n")) {
+                if (line.startsWith("[LÕPP] Kapital:")) {
+                    return line.replace("[LÕPP] Kapital:", "").trim();
+                }
+            }
+        } catch (java.io.IOException ex) {
+            System.err.println("Eelmise mängu logi lugemine ebaõnnestus: " + ex.getMessage());
+        }
+        return "—";
+    }
 }
