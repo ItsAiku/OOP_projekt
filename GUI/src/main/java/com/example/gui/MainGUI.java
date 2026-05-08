@@ -9,7 +9,6 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.*;
 import javafx.stage.*;
 
 import java.io.OutputStream;
@@ -19,14 +18,14 @@ import java.util.Random;
 
 public class MainGUI extends Application {
 
-    // ── Game state ────────────────────────────────────────────────────────────
+    //mängu elemendid
     private StartUp startup;
     private Tegevus tegevus;
     private KapitalCheck check;
     private Random rand;
     private boolean gameRunning;
 
-    // ── UI components ─────────────────────────────────────────────────────────
+    // UI osad
     private Label kapitalLabel;
     private Label kliendidLabel;
     private Label töötajadCountLabel;
@@ -41,7 +40,7 @@ public class MainGUI extends Application {
     private Button müüBtn;
     private Label statusBar;
 
-    // ── Palette ───────────────────────────────────────────────────────────────
+    //värvid kasutamiseks
     private static final String BG_DARK   = "#0d1117";
     private static final String BG_CARD   = "#161b22";
     private static final String BG_HOVER  = "#1f2937";
@@ -60,49 +59,58 @@ public class MainGUI extends Application {
         initGame();
         redirectSystemOut();
 
-        // ── Root ──────────────────────────────────────────────────────────────
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BG_DARK + ";");
         root.setPadding(new Insets(14));
 
-        // ── Title bar ─────────────────────────────────────────────────────────
-        root.setTop(buildTitleBar());
+        root.setTop(buildPealkiri());
 
-        // ── Content ───────────────────────────────────────────────────────────
         HBox content = new HBox(14);
         content.setFillHeight(true);
         content.setPadding(new Insets(10, 0, 10, 0));
         HBox.setHgrow(content, Priority.ALWAYS);
 
-        VBox leftCol = buildLeftColumn();
-        VBox rightCol = buildRightColumn();
+        VBox leftCol = buildVasakTulp();
+        VBox rightCol = buildParemTulp();
         HBox.setHgrow(rightCol, Priority.ALWAYS);
 
         content.getChildren().addAll(leftCol, rightCol);
         root.setCenter(content);
 
-        // ── Status bar ────────────────────────────────────────────────────────
+        //stats
         statusBar = new Label("Klahvikäsud:  1-Palka  2-Turundus  3-Reroll  4-Perkid  5-Skip  6-Müü");
         statusBar.setStyle("-fx-text-fill: " + TEXT_DIM + "; -fx-font-size: 11px; -fx-font-family: monospace;");
         statusBar.setMaxWidth(Double.MAX_VALUE);
         statusBar.setPadding(new Insets(6, 4, 2, 4));
         root.setBottom(statusBar);
 
-        // ── Keyboard shortcuts ────────────────────────────────────────────────
-        root.setOnKeyPressed(e -> {
+        //klaviatuuri shortcutid
+        root.setOnKeyPressed(e -> {//klaviatuuri numbriklahivd saavad teha erinevaid tegevusi
             if (!gameRunning) return;
             switch (e.getCode()) {
-                case DIGIT1: case NUMPAD1: handlePalkamine(); break;
-                case DIGIT2: case NUMPAD2: handleTurundus();  break;
-                case DIGIT3: case NUMPAD3: handleReroll();    break;
-                case DIGIT4: case NUMPAD4: handlePerkid();    break;
-                case DIGIT5: case NUMPAD5: handleSkip();      break;
-                case DIGIT6: case NUMPAD6: handleMüü();       break;
+                case DIGIT1: case NUMPAD1:
+                    handlePalkamine();
+                    break;
+                case DIGIT2: case NUMPAD2:
+                    handleTurundus();
+                    break;
+                case DIGIT3: case NUMPAD3:
+                    handleReroll();
+                    break;
+                case DIGIT4: case NUMPAD4:
+                    handlePerkid();
+                    break;
+                case DIGIT5: case NUMPAD5:
+                    handleSkip();
+                    break;
+                case DIGIT6: case NUMPAD6:
+                    handleMüü();
+                    break;
                 default: break;
             }
         });
 
-        // ── Scene ─────────────────────────────────────────────────────────────
+        //scene ja stage setup
         Scene scene = new Scene(root, 1000, 650);
         scene.setFill(Color.web(BG_DARK));
         stage.setScene(scene);
@@ -110,28 +118,18 @@ public class MainGUI extends Application {
         stage.setMinWidth(750);
         stage.setMinHeight(520);
         stage.show();
-        root.requestFocus();
+        root.requestFocus();//teeb kindlaks, et klaviatuur võtab rootilt inputi
 
-        // ── Start flow ────────────────────────────────────────────────────────
-        promptFirstWorker();
+        //alustab mängu
+        alusta();
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  UI BUILDERS
-    // ═════════════════════════════════════════════════════════════════════════
-
-    private HBox buildTitleBar() {
-        Label icon = new Label("🚀");
-        icon.setStyle("-fx-font-size: 24px;");
-
+    // UI ────────────────────────────────────────────────────────
+    private VBox buildPealkiri() {
         Label title = new Label("Startup Simulaator");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_MAIN + "; -fx-font-family: 'Segoe UI', sans-serif;");
 
-        Label sub = new Label("— juhi oma idufirmat edu poole");
-        sub.setStyle("-fx-font-size: 13px; -fx-text-fill: " + TEXT_DIM + ";");
-        sub.setPadding(new Insets(6, 0, 0, 8));
-
-        HBox bar = new HBox(10, icon, title, sub);
+        HBox bar = new HBox(10, title);
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.setPadding(new Insets(0, 0, 8, 4));
 
@@ -139,33 +137,32 @@ public class MainGUI extends Application {
         sep.setStyle("-fx-background-color: #30363d;");
 
         VBox wrapper = new VBox(bar, sep);
-        return bar;
+        return wrapper;
     }
 
-    /** Left column: stats card + workers list */
-    private VBox buildLeftColumn() {
+    private VBox buildVasakTulp() {
         VBox col = new VBox(12);
         col.setPrefWidth(260);
         col.setMinWidth(200);
         col.setMaxWidth(320);
 
-        // Stats card
-        VBox statsCard = card("📊  Ettevõtte Seis");
-        statsCard.setStyle(statsCard.getStyle() + " -fx-border-color: " + ACCENT + "44;");
+        // Stats area
+        VBox statsArea = card("Ettevõtte seis");
+        statsArea.setStyle(statsArea.getStyle() + " -fx-border-color: " + ACCENT + "44;");
 
-        kapitalLabel       = statLine("💰 Kapital",     "10 000 €", GREEN);
-        kliendidLabel      = statLine("👥 Kliendid",    "0",        ACCENT);
-        töötajadCountLabel = statLine("🧑‍💼 Töötajad",   "0",        YELLOW);
-        tuluLabel          = statLine("📈 Tulu/klient", "20 €",     PURPLE);
+        kapitalLabel = statLine("Kapital", "10 000 €", GREEN);
+        kliendidLabel = statLine("Kliendid", "0", ACCENT);
+        töötajadCountLabel = statLine("Töötajad", "0", YELLOW);
+        tuluLabel = statLine("Tulu/klient", "20 €", PURPLE);
 
-        statsCard.getChildren().addAll(
+        statsArea.getChildren().addAll(
                 kapitalLabel, sep(), kliendidLabel, sep(),
                 töötajadCountLabel, sep(), tuluLabel
         );
 
-        // Workers card
-        VBox workersCard = card("🧑‍💼  Töötajad");
-        VBox.setVgrow(workersCard, Priority.ALWAYS);
+        // Töötajad area
+        VBox tootajadArea = card("Töötajad");
+        VBox.setVgrow(tootajadArea, Priority.ALWAYS);
 
         töötajadBox = new VBox(6);
         ScrollPane scroll = new ScrollPane(töötajadBox);
@@ -174,36 +171,38 @@ public class MainGUI extends Application {
         scroll.setPrefHeight(200);
         VBox.setVgrow(scroll, Priority.ALWAYS);
 
-        workersCard.getChildren().add(scroll);
-        VBox.setVgrow(workersCard, Priority.ALWAYS);
+        tootajadArea.getChildren().add(scroll);
+        VBox.setVgrow(tootajadArea, Priority.ALWAYS);
 
-        col.getChildren().addAll(statsCard, workersCard);
+        col.getChildren().addAll(statsArea, tootajadArea);
         return col;
     }
 
-    /** Right column: action buttons + log */
-    private VBox buildRightColumn() {
+    private VBox buildParemTulp() {
         VBox col = new VBox(12);
         HBox.setHgrow(col, Priority.ALWAYS);
 
-        // Actions area
-        VBox actionsCard = card("⚡  Tegevused  (klahvid 1–6)");
-        actionsCard.setMaxHeight(260);
+        // Tegevuste area
+        VBox tegevusedArea = card("Tegevused (1–6)");
+        tegevusedArea.setMaxHeight(260);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
 
-        palkamineBtn = actionBtn("👤  Palka töötaja",      "Maksumus: uue töötaja palk/kuu",  GREEN,  "1");
-        turundusBtn  = actionBtn("📣  Turunduskampaania",   "Maksumus: 2–10% kapitalist",      ACCENT, "2");
-        rerollBtn    = actionBtn("🎲  Töökuse Reroll",      "Maksumus: 200 €",                 YELLOW, "3");
-        perkidBtn    = actionBtn("✨  Perkid",              "Maksumus: 500 €  (üllatus!)",     PURPLE, "4");
-        skipBtn      = actionBtn("⏭  Skip",                "Maksumus: 0 € — jäta kuu vahele", TEXT_DIM,"5");
-        müüBtn       = actionBtn("💸  Müü firma",           "Lõpeta mäng praeguse kapitaliga", RED,    "6");
+        palkamineBtn = actionBtn("Palka töötaja", "Maksumus: uue töötaja palk/kuu", GREEN, "1");
+        turundusBtn = actionBtn("Turunduskampaania", "Maksumus: 2–10% kapitalist", ACCENT, "2");
+        rerollBtn = actionBtn("Töökuse Reroll", "Maksumus: 200 €", YELLOW, "3");
+        perkidBtn = actionBtn("Perkid", "Maksumus: 500 €  (üllatus!)", PURPLE, "4");
+        skipBtn = actionBtn("Skip", "Maksumus: 0 € — jäta kuu vahele", TEXT_DIM, "5");
+        müüBtn = actionBtn("Müü firma", "Lõpeta mäng praeguse kapitaliga", RED, "6");
 
-        grid.add(palkamineBtn, 0, 0);  grid.add(turundusBtn, 1, 0);
-        grid.add(rerollBtn,    0, 1);  grid.add(perkidBtn,   1, 1);
-        grid.add(skipBtn,      0, 2);  grid.add(müüBtn,      1, 2);
+        grid.add(palkamineBtn, 0, 0);
+        grid.add(turundusBtn, 1, 0);
+        grid.add(rerollBtn, 0, 1);
+        grid.add(perkidBtn,   1, 1);
+        grid.add(skipBtn, 0, 2);
+        grid.add(müüBtn,      1, 2);
 
         for (int i = 0; i < 2; i++) {
             ColumnConstraints cc = new ColumnConstraints();
@@ -213,42 +212,41 @@ public class MainGUI extends Application {
             grid.getColumnConstraints().add(cc);
         }
 
-        actionsCard.getChildren().add(grid);
+        tegevusedArea.getChildren().add(grid);
 
-        // Wire up mouse clicks
+        // Hiirevajutused
         palkamineBtn.setOnAction(e -> handlePalkamine());
-        turundusBtn.setOnAction(e  -> handleTurundus());
-        rerollBtn.setOnAction(e    -> handleReroll());
-        perkidBtn.setOnAction(e    -> handlePerkid());
-        skipBtn.setOnAction(e      -> handleSkip());
-        müüBtn.setOnAction(e       -> handleMüü());
+        turundusBtn.setOnAction(e -> handleTurundus());
+        rerollBtn.setOnAction(e -> handleReroll());
+        perkidBtn.setOnAction(e -> handlePerkid());
+        skipBtn.setOnAction(e -> handleSkip());
+        müüBtn.setOnAction(e -> handleMüü());
 
         // Log area
-        VBox logCard = card("📋  Mängu Logi");
-        VBox.setVgrow(logCard, Priority.ALWAYS);
+        VBox logArea = card("Logi");
+        VBox.setVgrow(logArea, Priority.ALWAYS);
 
-        logArea = new TextArea();
-        logArea.setEditable(false);
-        logArea.setWrapText(true);
-        logArea.setStyle(
+        this.logArea = new TextArea();
+        this.logArea.setEditable(false);
+        this.logArea.setWrapText(true);
+        this.logArea.setStyle(
             "-fx-control-inner-background: #0d1117;" +
             "-fx-text-fill: " + TEXT_MAIN + ";" +
             "-fx-font-family: 'Consolas', monospace;" +
             "-fx-font-size: 12px;" +
             "-fx-border-color: transparent;"
         );
+        VBox.setVgrow(this.logArea, Priority.ALWAYS);
+        logArea.getChildren().add(this.logArea);
         VBox.setVgrow(logArea, Priority.ALWAYS);
-        logCard.getChildren().add(logArea);
-        VBox.setVgrow(logCard, Priority.ALWAYS);
 
-        VBox.setVgrow(actionsCard, Priority.NEVER);
-        col.getChildren().addAll(actionsCard, logCard);
+        VBox.setVgrow(tegevusedArea, Priority.NEVER);
+        col.getChildren().addAll(tegevusedArea, logArea);
         return col;
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  GAME ACTION HANDLERS
-    // ═════════════════════════════════════════════════════════════════════════
+
+    //  Mängu tegevused handlering
 
     private void handlePalkamine() {
         if (!gameRunning) return;
@@ -259,7 +257,7 @@ public class MainGUI extends Application {
             return;
         }
 
-        Optional<String> result = inputDialog(
+        Optional<String> result = userInputData(
             "Töötaja Palkamine",
             "Uus töötaja lisatakse firmale. Palk arvestatakse iga kuu.",
             "Töötaja nimi:",
@@ -271,13 +269,12 @@ public class MainGUI extends Application {
                 if (nimi.trim().isEmpty())
                     throw new IllegalArgumentException("Töötaja nimi ei tohi olla tühi!");
 
-                payTurn();
-                // Follows same pattern as Main.java: Tegevus.töötajaPalkamine + lisaTöötaja
+                maksaPalka();
                 tegevus.töötajaPalkamine(startup, nimi.trim());
                 Töötaja uus = new Töötaja(nimi.trim(), startup.getTöötajad().size());
                 startup.lisaTöötaja(uus);
 
-                log("✅ Palkasid töötaja " + uus.getNimi() + " | palk: " + uus.getPalk()
+                log("Palkasid töötaja " + uus.getNimi() + " | palk: " + uus.getPalk()
                     + " € | töökus: " + uus.getTöökus());
                 endTurn();
 
@@ -297,10 +294,10 @@ public class MainGUI extends Application {
         }
 
         int eelmine = startup.getKlientideArv();
-        payTurn();
         tegevus.turundusKampaania(startup);
         int muutus = startup.getKlientideArv() - eelmine;
-        log("📣 Turunduskampaania! " + (muutus >= 0 ? "+" : "") + muutus + " klienti.");
+        log("Turunduskampaania! " + muutus + " klienti.");
+        maksaPalka();
         endTurn();
     }
 
@@ -318,7 +315,7 @@ public class MainGUI extends Application {
         }
 
         ChoiceDialog<String> dlg = new ChoiceDialog<>();
-        dlg.setTitle("Töökuse Reroll — 200 €");
+        dlg.setTitle("Töökuse reroll — 200 €");
         dlg.setHeaderText("Vali töötaja, kelle töökust soovid rerollida.");
         dlg.setContentText("Töötaja:");
         styleDialog(dlg.getDialogPane());
@@ -331,18 +328,19 @@ public class MainGUI extends Application {
         Optional<String> result = dlg.showAndWait();
         result.ifPresent(valitud -> {
             try {
-                // Extract just the name (before the spacing)
                 String nimi = valitud.split("  \\(")[0].trim();
-                payTurn();
                 tegevus.töökuseReroll(startup, nimi);
 
-                double newTöökus = startup.getTöötajad().stream()
-                    .filter(t -> t.getNimi().equals(nimi))
-                    .mapToDouble(Töötaja::getTöökus)
-                    .findFirst().orElse(-1);
-
-                log("🎲 Reroll: " + nimi + " uus töökus: " + newTöökus);
+                double newTöökus = -1;
+                for (Töötaja t : startup.getTöötajad()) {
+                    if (t.getNimi().equals(nimi)) {
+                        newTöökus = t.getTöökus();
+                        break;
+                    }
+                }
+                log("Reroll: " + nimi + " uus töökus: " + newTöökus);
                 endTurn();
+                maksaPalka();
             } catch (Exception ex) {
                 showError("Reroll ebaõnnestus: " + ex.getMessage());
             }
@@ -358,18 +356,17 @@ public class MainGUI extends Application {
             return;
         }
 
-        payTurn();
         int number = rand.nextInt(100) + 1;
         log("✨ Perkid aktiveeritud…");
-        // tegevus.perkid prints to System.out; redirected stream catches it in logArea
         tegevus.perkid(number, startup);
+        maksaPalka();
         endTurn();
     }
 
     private void handleSkip() {
         if (!gameRunning) return;
-        payTurn();
-        log("⏭  Skip — jätsid kuu vahele.");
+        log("Skip — jätsid kuu vahele.");
+        maksaPalka();
         endTurn();
     }
 
@@ -384,28 +381,25 @@ public class MainGUI extends Application {
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            log("💸 Müüsid firma " + startup.getKapital() + " € eest! Mäng on läbi.");
+            log("Müüsid firma " + startup.getKapital() + " € eest! Mäng on läbi.");
             endGame("Palju õnne! Müüsid firma\n" + startup.getKapital() + " € eest.");
         }
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  TURN LOGIC
-    // ═════════════════════════════════════════════════════════════════════════
 
-    /** Deduct salaries — called at the start of every turn, matching Main.java logic */
-    private void payTurn() {
-        int totalPalk = 0;
+    //  Mängukordadega kaasnevad meetotid
+
+    private void maksaPalka() {
+        int koguPalk = 0;
         for (Töötaja t : startup.getTöötajad()) {
-            totalPalk += t.getPalk();
+            koguPalk += t.getPalk();
             startup.setKapital(startup.getKapital() - t.getPalk());
         }
-        if (totalPalk > 0) log("💼 Palgad makstud: −" + totalPalk + " €");
+        if (koguPalk > 0) log("Palgad makstud: −" + koguPalk + " €");
     }
 
-    /** Recalculate stats, earn revenue, handle churn — runs after every action */
     private void endTurn() {
-        // Recalculate average töökus and resulting revenue per client
+        // Arvutab töökuse uuesti ja seab tulu kliendi kohta vastavalt sellele
         if (!startup.getTöötajad().isEmpty()) {
             double sum = 0;
             for (Töötaja t : startup.getTöötajad()) sum += t.getTöökus();
@@ -413,31 +407,30 @@ public class MainGUI extends Application {
             startup.setTuluKliendiKohta((int)(startup.getBaseTuluKliendiKohta() * avg));
         }
 
-        // 5 % client churn per month
+        // 5 % kliente lahkub iga kuu (churn)
         startup.setKliendid((int)(startup.getKlientideArv() * 0.95));
 
-        // Earn revenue from clients
+        // Tulu arvutamine ja kapitali suurendamine
         int tulu = startup.getKlientideArv() * startup.getTuluKliendiKohta();
         startup.suurendaKapital(tulu);
-        log("💵 Teenitud tulu: +" + tulu + " €\n──────────────────────────");
+        log("Teenitud tulu: +" + tulu + " €\n──────────────────────────");
 
         updateUI();
 
         if (startup.getKapital() <= 0) {
-            log("❌ Kapital sai otsa! Mäng läbi.");
+            log("Kapital sai otsa! Mäng läbi.");
             endGame("Kapital sai otsa!\nMäng on läbi.");
         }
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  UI HELPERS
-    // ═════════════════════════════════════════════════════════════════════════
+
+    //  UI uuendamine ja muud meetodid
 
     private void updateUI() {
-        kapitalLabel.setText("💰  " + startup.getKapital() + " €");
-        kliendidLabel.setText("👥  " + startup.getKlientideArv());
-        töötajadCountLabel.setText("🧑‍💼  " + startup.getTöötajad().size());
-        tuluLabel.setText("📈  " + startup.getTuluKliendiKohta() + " €/klient");
+        kapitalLabel.setText(startup.getKapital() + " €");
+        kliendidLabel.setText(String.valueOf(startup.getKlientideArv()));
+        töötajadCountLabel.setText(String.valueOf(startup.getTöötajad().size()));
+        tuluLabel.setText(startup.getTuluKliendiKohta() + " €/klient");
 
         töötajadBox.getChildren().clear();
         for (Töötaja t : startup.getTöötajad()) {
@@ -455,21 +448,19 @@ public class MainGUI extends Application {
             row.getChildren().addAll(name, details);
             töötajadBox.getChildren().add(row);
 
-            // Hover effect (mouse event)
             row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #2d333b; -fx-background-radius: 6;"));
             row.setOnMouseExited(e  -> row.setStyle("-fx-background-color: " + BG_HOVER + "; -fx-background-radius: 6;"));
         }
     }
 
-    /** Ask for the very first worker's name before the game begins */
-    private void promptFirstWorker() {
+    private void alusta() {
         log("Tere tulemast Startup Simulaatorisse!");
         log("Algkapital: 10 000 €");
         log("──────────────────────────");
 
-        String nimi = "Töötaja";
+        String nimi;
         while (true) {
-            Optional<String> result = inputDialog(
+            Optional<String> result = userInputData(
                 "Alustame!",
                 "Tere tulemast Startup Simulaatorisse!\n\nSisesta oma esimese töötaja nimi, et mäng käivitada.",
                 "Töötaja nimi:",
@@ -477,7 +468,6 @@ public class MainGUI extends Application {
             );
 
             if (result.isEmpty()) {
-                // User closed dialog — use default to avoid stuck state
                 nimi = "Töötaja 1";
                 break;
             }
@@ -491,7 +481,7 @@ public class MainGUI extends Application {
 
         Töötaja esimene = new Töötaja(nimi, 1);
         startup.lisaTöötaja(esimene);
-        log("👤 Esimene töötaja: " + nimi + " | palk: " + esimene.getPalk()
+        log("Esimene töötaja: " + nimi + " | palk: " + esimene.getPalk()
             + " € | töökus: " + esimene.getTöökus());
         log("──────────────────────────");
         updateUI();
@@ -536,15 +526,13 @@ public class MainGUI extends Application {
         alert.showAndWait();
     }
 
-    /** Generic text-input dialog with consistent styling */
-    private Optional<String> inputDialog(String title, String header, String prompt, String def) {
+    private Optional<String> userInputData(String title, String header, String prompt, String def) {
         TextInputDialog dlg = new TextInputDialog(def);
         dlg.setTitle(title);
         dlg.setHeaderText(header);
         dlg.setContentText(prompt);
         styleDialog(dlg.getDialogPane());
 
-        // Allow submitting with Enter (keyboard event)
         dlg.getEditor().setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 dlg.getEditor().getScene().getWindow().hide();
@@ -554,16 +542,12 @@ public class MainGUI extends Application {
         return dlg.showAndWait();
     }
 
-    /** Apply dark theme to any dialog pane */
     private void styleDialog(DialogPane pane) {
         pane.setStyle(
             "-fx-background-color: " + BG_CARD + ";" +
             "-fx-border-color: #30363d;" +
             "-fx-border-width: 1;"
         );
-        //pane.lookup(".content.label") != null;
-        pane.getStylesheets(); // no-op call to keep the chain
-        // Style every label inside the dialog
         pane.lookupAll(".label").forEach(node -> {
             if (node instanceof Label l) {
                 l.setStyle("-fx-text-fill: " + TEXT_MAIN + ";");
@@ -576,11 +560,8 @@ public class MainGUI extends Application {
         });
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  WIDGET BUILDERS
-    // ═════════════════════════════════════════════════════════════════════════
+    //  Widgetid ja styling
 
-    /** Styled card container */
     private VBox card(String heading) {
         Label title = new Label(heading);
         title.setStyle(
@@ -608,7 +589,6 @@ public class MainGUI extends Application {
         return card;
     }
 
-    /** Single coloured stat label */
     private Label statLine(String label, String value, String color) {
         Label l = new Label(value);
         l.setStyle(
@@ -617,11 +597,10 @@ public class MainGUI extends Application {
             "-fx-font-weight: bold;" +
             "-fx-font-family: 'Consolas', monospace;"
         );
-        l.setUserData(label); // store label name for future reference
+        l.setUserData(label);
         return l;
     }
 
-    /** Action button with colour, badge key, and hover animation */
     private Button actionBtn(String text, String desc, String color, String key) {
         Label keyBadge = new Label("[" + key + "]");
         keyBadge.setStyle(
@@ -660,8 +639,8 @@ public class MainGUI extends Application {
                        "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;";
 
         btn.setStyle(base);
-        btn.setOnMouseEntered(e -> btn.setStyle(hover));   // mouse event
-        btn.setOnMouseExited(e  -> btn.setStyle(base));    // mouse event
+        btn.setOnMouseEntered(e -> btn.setStyle(hover));
+        btn.setOnMouseExited(e -> btn.setStyle(base));
 
         return btn;
     }
@@ -672,22 +651,16 @@ public class MainGUI extends Application {
         return s;
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  INITIALISATION HELPERS
-    // ═════════════════════════════════════════════════════════════════════════
+    //  initiators
 
     private void initGame() {
-        startup     = new StartUp(10000);
-        tegevus     = new Tegevus();
-        check       = new KapitalCheck();
-        rand        = new Random();
+        startup = new StartUp(10000);
+        tegevus = new Tegevus();
+        check = new KapitalCheck();
+        rand = new Random();
         gameRunning = true;
     }
 
-    /**
-     * Redirect System.out so that Tegevus.perkid() println calls are
-     * captured and displayed in the log TextArea instead of the console.
-     */
     private void redirectSystemOut() {
         PrintStream ps = new PrintStream(new OutputStream() {
             private final StringBuilder buf = new StringBuilder();
@@ -710,4 +683,7 @@ public class MainGUI extends Application {
         });
         System.setOut(ps);
     }
+
+
+
 }
