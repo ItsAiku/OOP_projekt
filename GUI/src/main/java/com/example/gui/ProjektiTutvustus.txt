@@ -18,6 +18,7 @@ Projekti tegemine toimus mitmes etapis:
 esimesel nädalavahetusel arutasime projekti üldist ideed, valisime teema ning panime paika klasside struktuuri ja nende eesmärgid.
 teisel kokkusaamisel keskendusime klasside funktsionaalsuse loomisele ning proovisime need tööle saada.
 viimasel kokkusaamisel koostasime Main meetodi ning sidusime kõik klassid omavahel tervikuks, et programm töötaks ühtse süsteemina.
+Projekti teises etapis lõime GUI ja ka tulemuse salvestamise faili, nii et mängija näeb eelmise mängu tulemust.
 
 Rühmatöösse panustamine:
 Tegime kogu projekti vältel rühmatööd koos ning panustasime võrdselt kõikidesse etappidesse.
@@ -25,6 +26,7 @@ Projekti peale kulus kokku ligikaudu 20 tundi.
 
 Projekti tegemise mured:
 Suuri probleeme projekti käigus ei tekkinud, kuid keeruliseks osutus projekti struktuuri planeerimine ja klasside väljamõtlemine.
+GUI loomine JavaFX baasil oli probleemiks. Abiks tuli Claude.
 
 Hinnang:
 Oleme oma töö lõpptulemusega üldiselt rahul. Küll aga tulevikus võiksime lisada mängule rohkem funktsionaalsust.
