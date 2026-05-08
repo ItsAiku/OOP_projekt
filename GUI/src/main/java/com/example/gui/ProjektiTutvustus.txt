@@ -7,7 +7,9 @@ Simulaatori eesmärk on kasvatada ettevõtte väärtust ja teenida kasumit, et l
 Mäng algab, kui käivitatakse Main.java fail, mille järel saab mängija sisestada valikuid terminali kaudu. Mängija saab valida erinevate tegevuste vahel, mis mõjutavad ettevõtte arengut, näiteks töötajate palkamine ja muud strateegilised otsused.
 
 Klasside eesmärgid:
+Projekt läheb käima Launcher.java klassist.
 Main - Main klass vastutab programmi käivitamise ja kasutajaga suhtlemise eest. Selles klassis asub menüü, mille kaudu mängija teeb oma valikuid.
+MainGUI - sama funktsionaalsusega mis main, aga GUI versioon JavaFX baasil.
 KapitalCheck - Kontrollib piisava kapitali olemasolu, et saaks tegevusi teha (tegevused maksavad).
 StartUp - StartUp klass haldab kogu ettevõtte loogikat, sealhulgas raha, töötajaid ja üldist arengut.
 Tegevus - Tegevus klassis on kirjeldatud kõik võimalikud tegevused, mida mängija saab teha. Näiteks: töötaja palkamine, turundus, töötaja töökuse parendamine, boonused.
@@ -22,7 +24,10 @@ Projekti teises etapis lõime GUI ja ka tulemuse salvestamise faili, nii et män
 
 Rühmatöösse panustamine:
 Tegime kogu projekti vältel rühmatööd koos ning panustasime võrdselt kõikidesse etappidesse.
-Projekti peale kulus kokku ligikaudu 20 tundi.
+Projekti peale kulus ligikaudu 20 tundi backend + 10 tundi GUI loomisele.
+
+Tehisintellekti kasutamine:
+Projekti käigus kasutasime Claude't, peamiselt GUI loomisel JavaFX baasil ja Main.java klassist MainGUI.java ümbertegemiseks.
 
 Projekti tegemise mured:
 Suuri probleeme projekti käigus ei tekkinud, kuid keeruliseks osutus projekti struktuuri planeerimine ja klasside väljamõtlemine.
