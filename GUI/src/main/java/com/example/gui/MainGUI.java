@@ -5,14 +5,18 @@ import javafx.application.Platform;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Random;
 
@@ -40,7 +44,7 @@ public class MainGUI extends Application {
     private Button skipBtn;
     private Button müüBtn;
     private Label statusBar;
-    private Label lastGameCapitalLabel;
+    private Label viimaseManguTulemus;
 
     //värvid kasutamiseks
     private static final String BG_DARK   = "#0d1117";
@@ -50,8 +54,6 @@ public class MainGUI extends Application {
     private static final String GREEN     = "#3fb950";
     private static final String YELLOW    = "#d29922";
     private static final String PURPLE    = "#bc8cff";
-    private static final String RED       = "#f85149";
-    private static final String TEAL      = "#39d353";
     private static final String TEXT_MAIN = "#e6edf3";
     private static final String TEXT_DIM  = "#8b949e";
 
@@ -64,7 +66,6 @@ public class MainGUI extends Application {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BG_DARK + ";");
         root.setPadding(new Insets(14));
-
         root.setTop(buildPealkiri());
 
         HBox content = new HBox(14);
@@ -120,47 +121,34 @@ public class MainGUI extends Application {
         stage.setMinWidth(750);
         stage.setMinHeight(520);
         stage.show();
-        root.requestFocus();//teeb kindlaks, et klaviatuur võtab rootilt inputi
+        root.requestFocus();//teeb kindlaks, et klaviatuur võtab root'ilt inputi
         stage.setOnCloseRequest(e -> saveLog());
-        root.requestFocus();
 
         //alustab mängu
         alusta();
     }
 
     // UI ────────────────────────────────────────────────────────
-    private VBox buildPealkiri() {
+    private HBox buildPealkiri() {
         Label title = new Label("Startup Simulaator");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_MAIN + "; -fx-font-family: 'Segoe UI', sans-serif;");
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_MAIN + ";");
 
-        String lastCapital = loadLastGameCapital();
-        Label lastTitle = new Label("EELMINE MÄNG");
-        lastTitle.setStyle("-fx-font-size: 10px; -fx-text-fill: " + TEXT_DIM + "; -fx-font-family: monospace;");
+        Label lastTitle = new Label("Last Game: ");
+        viimaseManguTulemus = new Label(loadLastGameCapital());
+        viimaseManguTulemus.setStyle("-fx-text-fill: " + YELLOW + "; -fx-font-weight: bold;");
 
-        lastGameCapitalLabel = new Label(lastCapital);
-        lastGameCapitalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + YELLOW + "; -fx-font-family: 'Consolas', monospace;");
-
-        VBox lastBox = new VBox(2, lastTitle, lastGameCapitalLabel);
+        HBox lastBox = new HBox(5, lastTitle, viimaseManguTulemus);
         lastBox.setAlignment(Pos.CENTER_RIGHT);
-        lastBox.setPadding(new Insets(4, 6, 4, 12));
-        lastBox.setStyle(
-                "-fx-background-color: " + BG_CARD + ";" +
-                        "-fx-border-color: " + YELLOW + "44;" +
-                        "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;"
-        );
+        lastBox.setPadding(new Insets(4, 6, 4, 6));
 
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         HBox bar = new HBox(10, title, spacer, lastBox);
         bar.setAlignment(Pos.CENTER_LEFT);
-        bar.setPadding(new Insets(0, 0, 8, 4));
+        bar.setPadding(new Insets(8, 4, 8, 4));
 
-        Separator sep = new Separator();
-        sep.setStyle("-fx-background-color: #30363d;");
-
-        VBox wrapper = new VBox(bar, sep);
-        return wrapper;
+        return bar;
     }
 
     private VBox buildVasakTulp() {
@@ -169,21 +157,17 @@ public class MainGUI extends Application {
         col.setMinWidth(200);
         col.setMaxWidth(320);
 
-        // Stats area
+        // stats area
         VBox statsArea = card("Ettevõtte seis");
-        statsArea.setStyle(statsArea.getStyle() + " -fx-border-color: " + ACCENT + "44;");
 
         kapitalLabel = statLine("Kapital", "10 000 €", GREEN);
         kliendidLabel = statLine("Kliendid", "0", ACCENT);
         töötajadCountLabel = statLine("Töötajad", "0", YELLOW);
         tuluLabel = statLine("Tulu/klient", "20 €", PURPLE);
 
-        statsArea.getChildren().addAll(
-                kapitalLabel, sep(), kliendidLabel, sep(),
-                töötajadCountLabel, sep(), tuluLabel
-        );
+        statsArea.getChildren().addAll(kapitalLabel, kliendidLabel, töötajadCountLabel, tuluLabel);
 
-        // Töötajad area
+        // töötajad area
         VBox tootajadArea = card("Töötajad");
         VBox.setVgrow(tootajadArea, Priority.ALWAYS);
 
@@ -191,11 +175,9 @@ public class MainGUI extends Application {
         ScrollPane scroll = new ScrollPane(töötajadBox);
         scroll.setFitToWidth(true);
         scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-        scroll.setPrefHeight(200);
-        VBox.setVgrow(scroll, Priority.ALWAYS);
 
+        VBox.setVgrow(scroll, Priority.ALWAYS);
         tootajadArea.getChildren().add(scroll);
-        VBox.setVgrow(tootajadArea, Priority.ALWAYS);
 
         col.getChildren().addAll(statsArea, tootajadArea);
         return col;
@@ -213,19 +195,19 @@ public class MainGUI extends Application {
         grid.setHgap(10);
         grid.setVgap(10);
 
-        palkamineBtn = actionBtn("Palka töötaja", "Maksumus: uue töötaja palk/kuu", GREEN, "1");
-        turundusBtn = actionBtn("Turunduskampaania", "Maksumus: 2–10% kapitalist", ACCENT, "2");
-        rerollBtn = actionBtn("Töökuse Reroll", "Maksumus: 200 €", YELLOW, "3");
-        perkidBtn = actionBtn("Perkid", "Maksumus: 500 €  (üllatus!)", PURPLE, "4");
-        skipBtn = actionBtn("Skip", "Maksumus: 0 € — jäta kuu vahele", TEXT_DIM, "5");
-        müüBtn = actionBtn("Müü firma", "Lõpeta mäng praeguse kapitaliga", RED, "6");
+        palkamineBtn = actionBtn("Palka töötaja", "Maksumus: uue töötaja palk/kuu [1]");
+        turundusBtn = actionBtn("Turunduskampaania", "Maksumus: 2–10% kapitalist [2]");
+        rerollBtn = actionBtn("Töökuse Reroll", "Maksumus: 200 € [3]");
+        perkidBtn = actionBtn("Perkid", "Maksumus: 500 €  (üllatus!) [4]");
+        skipBtn = actionBtn("Skip", "Maksumus: 0 € — jäta kuu vahele [5]");
+        müüBtn = actionBtn("Müü firma", "Lõpeta mäng praeguse kapitaliga [6]");
 
         grid.add(palkamineBtn, 0, 0);
         grid.add(turundusBtn, 1, 0);
         grid.add(rerollBtn, 0, 1);
-        grid.add(perkidBtn,   1, 1);
+        grid.add(perkidBtn, 1, 1);
         grid.add(skipBtn, 0, 2);
-        grid.add(müüBtn,      1, 2);
+        grid.add(müüBtn, 1, 2);
 
         for (int i = 0; i < 2; i++) {
             ColumnConstraints cc = new ColumnConstraints();
@@ -252,24 +234,16 @@ public class MainGUI extends Application {
         this.logArea = new TextArea();
         this.logArea.setEditable(false);
         this.logArea.setWrapText(true);
-        this.logArea.setStyle(
-            "-fx-control-inner-background: #0d1117;" +
-            "-fx-text-fill: " + TEXT_MAIN + ";" +
-            "-fx-font-family: 'Consolas', monospace;" +
-            "-fx-font-size: 12px;" +
-            "-fx-border-color: transparent;"
-        );
+        this.logArea.setStyle("-fx-control-inner-background: #0d1117;" + "-fx-text-fill: " + TEXT_MAIN + ";" +  "-fx-font-family: 'Consolas', monospace;" + "-fx-font-size: 12px;" + "-fx-border-color: transparent;");
         VBox.setVgrow(this.logArea, Priority.ALWAYS);
         logArea.getChildren().add(this.logArea);
-        VBox.setVgrow(logArea, Priority.ALWAYS);
 
-        VBox.setVgrow(tegevusedArea, Priority.NEVER);
         col.getChildren().addAll(tegevusedArea, logArea);
         return col;
     }
 
 
-    //  Mängu tegevused handlering
+    //  Mängu tegevused (handling)
 
     private void handlePalkamine() {
         if (!gameRunning) return;
@@ -297,12 +271,11 @@ public class MainGUI extends Application {
                 Töötaja uus = new Töötaja(nimi.trim(), startup.getTöötajad().size());
                 startup.lisaTöötaja(uus);
 
-                log("Palkasid töötaja " + uus.getNimi() + " | palk: " + uus.getPalk()
-                    + " € | töökus: " + uus.getTöökus());
+                log("Palkasid töötaja " + uus.getNimi() + " | palk: " + uus.getPalk()  + " € | töökus: " + uus.getTöökus());
                 endTurn();
 
-            } catch (IllegalArgumentException ex) {
-                showError(ex.getMessage());
+            } catch (IllegalArgumentException e) {
+                showError(e.getMessage());
             }
         });
     }
@@ -341,7 +314,6 @@ public class MainGUI extends Application {
         dlg.setTitle("Töökuse reroll — 200 €");
         dlg.setHeaderText("Vali töötaja, kelle töökust soovid rerollida.");
         dlg.setContentText("Töötaja:");
-        styleDialog(dlg.getDialogPane());
 
         for (Töötaja t : startup.getTöötajad()) {
             dlg.getItems().add(t.getNimi() + "  (töökus: " + t.getTöökus() + ")");
@@ -400,7 +372,6 @@ public class MainGUI extends Application {
         confirm.setTitle("Müü Firma");
         confirm.setHeaderText("Kas oled kindel, et soovid firmast loobuda?");
         confirm.setContentText("Müüd firma " + startup.getKapital() + " € eest. Mäng lõpeb.");
-        styleDialog(confirm.getDialogPane());
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -471,8 +442,6 @@ public class MainGUI extends Application {
             row.getChildren().addAll(name, details);
             töötajadBox.getChildren().add(row);
 
-            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #2d333b; -fx-background-radius: 6;"));
-            row.setOnMouseExited(e  -> row.setStyle("-fx-background-color: " + BG_HOVER + "; -fx-background-radius: 6;"));
         }
     }
 
@@ -537,7 +506,6 @@ public class MainGUI extends Application {
         alert.setTitle("Viga");
         alert.setHeaderText("Midagi läks valesti");
         alert.setContentText(msg);
-        styleDialog(alert.getDialogPane());
         alert.showAndWait();
     }
 
@@ -546,7 +514,6 @@ public class MainGUI extends Application {
         alert.setTitle("Info");
         alert.setHeaderText(null);
         alert.setContentText(msg);
-        styleDialog(alert.getDialogPane());
         alert.showAndWait();
     }
 
@@ -555,7 +522,6 @@ public class MainGUI extends Application {
         dlg.setTitle(title);
         dlg.setHeaderText(header);
         dlg.setContentText(prompt);
-        styleDialog(dlg.getDialogPane());
 
         dlg.getEditor().setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
@@ -566,113 +532,33 @@ public class MainGUI extends Application {
         return dlg.showAndWait();
     }
 
-    private void styleDialog(DialogPane pane) {
-        pane.setStyle(
-            "-fx-background-color: " + BG_CARD + ";" +
-            "-fx-border-color: #30363d;" +
-            "-fx-border-width: 1;"
-        );
-        pane.lookupAll(".label").forEach(node -> {
-            if (node instanceof Label l) {
-                l.setStyle("-fx-text-fill: " + TEXT_MAIN + ";");
-            }
-        });
-        pane.lookupAll(".text-field").forEach(node -> {
-            if (node instanceof TextField tf) {
-                tf.setStyle("-fx-control-inner-background: " + BG_DARK + "; -fx-text-fill: " + TEXT_MAIN + "; -fx-border-color: #30363d;");
-            }
-        });
-    }
-
     //  Widgetid ja styling
 
     private VBox card(String heading) {
         Label title = new Label(heading);
-        title.setStyle(
-            "-fx-font-size: 12px; -fx-font-weight: bold;" +
-            "-fx-text-fill: " + TEXT_DIM + ";" +
-            "-fx-font-family: 'Segoe UI', sans-serif;"
-        );
-        title.setPadding(new Insets(0, 0, 8, 0));
+        title.setStyle("-fx-font-weight: bold; -fx-text-fill: " + TEXT_DIM + ";");
 
-        Separator s = new Separator();
-        s.setStyle("-fx-background-color: #30363d;");
-        s.setPadding(new Insets(0, 0, 10, 0));
-
-        VBox card = new VBox(6, title, s);
-        card.setPadding(new Insets(14));
-        card.setStyle(
-            "-fx-background-color: " + BG_CARD + ";" +
-            "-fx-background-radius: 10;" +
-            "-fx-border-color: #21262d;" +
-            "-fx-border-radius: 10;" +
-            "-fx-border-width: 1;"
-        );
-        DropShadow ds = new DropShadow(8, Color.web("#00000066"));
-        card.setEffect(ds);
+        VBox card = new VBox(title);
+        card.setPadding(new Insets(12));
+        card.setStyle("-fx-background-color: " + BG_CARD + ";");
         return card;
     }
 
     private Label statLine(String label, String value, String color) {
-        Label l = new Label(value);
-        l.setStyle(
-            "-fx-text-fill: " + color + ";" +
-            "-fx-font-size: 13px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-family: 'Consolas', monospace;"
-        );
-        l.setUserData(label);
+        Label l = new Label(label + ": " + value);
+        l.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 13px; -fx-font-weight: bold;");
         return l;
     }
 
-    private Button actionBtn(String text, String desc, String color, String key) {
-        Label keyBadge = new Label("[" + key + "]");
-        keyBadge.setStyle(
-            "-fx-text-fill: " + TEXT_DIM + ";" +
-            "-fx-font-size: 10px;" +
-            "-fx-font-family: monospace;"
-        );
-
-        Label main = new Label(text);
-        main.setStyle("-fx-text-fill: " + TEXT_MAIN + "; -fx-font-size: 13px; -fx-font-weight: bold;");
-        main.setWrapText(true);
-
-        Label sub = new Label(desc);
-        sub.setStyle("-fx-text-fill: " + TEXT_DIM + "; -fx-font-size: 10px;");
-        sub.setWrapText(true);
-
-        VBox inner = new VBox(2, main, sub);
-
-        HBox content = new HBox(8, keyBadge, inner);
-        content.setAlignment(Pos.CENTER_LEFT);
-        content.setMouseTransparent(true);
-
-        Button btn = new Button();
-        btn.setGraphic(content);
+    private Button actionBtn(String text, String desc) {
+        Button btn = new Button(text + "\n" + desc);
         btn.setMaxWidth(Double.MAX_VALUE);
-        btn.setMaxHeight(Double.MAX_VALUE);
-        btn.setPadding(new Insets(12, 14, 12, 14));
+        btn.setWrapText(true);
+        btn.setPadding(new Insets(10, 14, 10, 14));
+        btn.setStyle("-fx-font-size: 12px;");
         GridPane.setHgrow(btn, Priority.ALWAYS);
         GridPane.setFillWidth(btn, true);
-
-        String base = "-fx-background-color: " + BG_HOVER + ";" +
-                      "-fx-border-color: " + color + "55;" +
-                      "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;";
-        String hover = "-fx-background-color: " + color + "22;" +
-                       "-fx-border-color: " + color + ";" +
-                       "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;";
-
-        btn.setStyle(base);
-        btn.setOnMouseEntered(e -> btn.setStyle(hover));
-        btn.setOnMouseExited(e -> btn.setStyle(base));
-
         return btn;
-    }
-
-    private Separator sep() {
-        Separator s = new Separator();
-        s.setStyle("-fx-background-color: #21262d;");
-        return s;
     }
 
     //  initiators
@@ -694,7 +580,9 @@ public class MainGUI extends Application {
                 if (c == '\n') {
                     String line = buf.toString();
                     buf.setLength(0);
-                    if (!line.isBlank()) logArea.appendText("   " + line + "\n"); // indent perks output
+                    if (!line.isBlank()){
+                        logArea.appendText("   " + line + "\n"); // indent perks output
+                    }
                 } else {
                     buf.append(c);
                 }
@@ -702,7 +590,9 @@ public class MainGUI extends Application {
             @Override
             public void write(byte[] b, int off, int len) {
                 String text = new String(b, off, len).trim();
-                if (!text.isBlank()) logArea.appendText("   " + text + "\n");
+                if (!text.isBlank()){
+                    logArea.appendText("   " + text + "\n");
+                }
             }
         });
         System.setOut(ps);
@@ -714,36 +604,39 @@ public class MainGUI extends Application {
         String content = logArea.getText();
         if (content == null || content.isBlank()) return;
 
-        // Always append a reliable final-capital marker
         String finalLine = "\n[LÕPP] Kapital: " + startup.getKapital() + " €";
-        String timestamp = java.time.LocalDateTime.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
-        java.nio.file.Path path = java.nio.file.Paths.get("startup_log_" + timestamp + ".txt");
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        String timestamp = now.format(formatter);
+        Path path = Paths.get("startup_log_" + timestamp + ".txt");
 
-        try {
-            java.nio.file.Files.writeString(path, content + finalLine);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
+            writer.write(content + finalLine);
             System.err.println("Log salvestatud: " + path.toAbsolutePath());
-        } catch (java.io.IOException ex) {
-            System.err.println("Logi salvestamine ebaõnnestus: " + ex.getMessage());
+        } catch (IOException e) {
+            System.err.println("Logi salvestamine ebaõnnestus: " + e.getMessage());
         }
     }
+
     private String loadLastGameCapital() {
         try {
-            java.nio.file.Path dir = java.nio.file.Paths.get(".");
-            java.util.Optional<java.nio.file.Path> latest = java.nio.file.Files.list(dir)
+            Path dir = Paths.get(".");
+            Optional<Path> latest = Files.list(dir)
                     .filter(p -> p.getFileName().toString().matches("startup_log_.*\\.txt"))
-                    .max(java.util.Comparator.comparing(p -> p.getFileName().toString()));
+                    .max(Comparator.comparing(p -> p.getFileName().toString()));
 
             if (latest.isEmpty()) return "—";
 
-            String content = java.nio.file.Files.readString(latest.get());
-            for (String line : content.split("\n")) {
-                if (line.startsWith("[LÕPP] Kapital:")) {
-                    return line.replace("[LÕPP] Kapital:", "").trim();
+            try (BufferedReader reader = new BufferedReader(new FileReader(latest.get().toFile()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("[LÕPP] Kapital:")) {
+                        return line.replace("[LÕPP] Kapital:", "").trim();
+                    }
                 }
             }
-        } catch (java.io.IOException ex) {
-            System.err.println("Eelmise mängu logi lugemine ebaõnnestus: " + ex.getMessage());
+        } catch (IOException e) {
+            System.err.println("Eelmise mängu logi lugemine ebaõnnestus: " + e.getMessage());
         }
         return "—";
     }
